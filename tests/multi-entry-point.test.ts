@@ -62,22 +62,22 @@ describe.each([{ name: "production" }, { name: "development" }])(
           import ViteExpress from "vite-express";
           
           const app = express();
-          ViteExpress.listen(app, 3000, () =>
-            console.log("Server is listening on port 3000..."),
+          ViteExpress.listen(app, 3001, () =>
+            console.log("Server is listening on port 3001..."),
           );
       `;
       fs.writeFileSync(tmpdir + "/index.js", indexJs);
       server = await cmd("node index.js")
         .cwd(tmpdir)
         .awaitOutput(["Running in", "development"])
-        .awaitOutput(`Server is listening on port 3000...`)
+        .awaitOutput(`Server is listening on port 3001...`)
         .run();
 
       const output = await puppeteer
         .launch({ headless: true })
         .then(async (browser) => {
           const page = await browser.newPage();
-          await page.goto(`http://localhost:3000`);
+          await page.goto(`http://localhost:3001`);
           return { browser, page };
         });
 
@@ -88,7 +88,7 @@ describe.each([{ name: "production" }, { name: "development" }])(
     });
 
     async function getRouteContent(path: string) {
-      await page.goto(`http://localhost:3000${path}`);
+      await page.goto(`http://localhost:3001${path}`);
       return await page.$eval("body", (el) => el.textContent);
     }
 

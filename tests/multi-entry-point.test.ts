@@ -19,24 +19,21 @@ describe.each([{ name: "production" }, { name: "development" }])(
     let page: Page;
 
     beforeAll(async () => {
-      const packageJson = `
-        {
-            "name": "2vru6r",
-            "version": "1.0.0",
-            "main": "index.js",
-            "type": "module",
-            "dependencies": {
-              "vite": "^5.4.11",
-              "express": "^4.21.1"
-            }
-          }
-`;
-      fs.writeFileSync(tmpdir + "/pacakge.json", packageJson);
-      await cmd(`npm install`).cwd(tmpdir).success().assert();
+      await cmd(`npm init -y`).cwd(tmpdir).success().assert();
+      const packageJson = fs.readFileSync(tmpdir + "/package.json");
+      const pacakgeJsonObj = JSON.parse(packageJson.toString());
+      (pacakgeJsonObj as { type: string }).type = "module";
+      fs.writeFileSync(
+        tmpdir + "/package.json",
+        JSON.stringify(pacakgeJsonObj),
+      );
+
       await cmd(`npm install ${path.resolve(__dirname, "..")}`)
         .cwd(tmpdir)
         .success()
         .assert();
+      await cmd(`npm install express`).cwd(tmpdir).success().assert();
+      await cmd(`npm install vite`).cwd(tmpdir).success().assert();
 
       const viteConfig = `
           import { defineConfig } from "vite";
